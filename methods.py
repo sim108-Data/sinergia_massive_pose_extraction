@@ -292,7 +292,7 @@ def ann(LABEL_LIST,ALL_FILES,k,normalisation,type_norm,points,angles,segments,co
         plt.show()
     return recall
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
-def pas_eval(LABEL_LIST,ALL_FILES,k,thresholdAngle,sub_method,normalisation,conf_type,type_norm,with_conf):
+def pas_eval(LABEL_LIST,ALL_FILES,k,thresholdAngle,sub_method,normalisation,conf_type,type_norm):
 
     ''' 
     INFO: 
@@ -327,7 +327,7 @@ def pas_eval(LABEL_LIST,ALL_FILES,k,thresholdAngle,sub_method,normalisation,conf
         # comparison with all the other pose
         for FILE_S in ALL_FILES:
             label_S=FILE_S[FILE_S.find("n/")+2 : FILE_S.rfind("/")] # label of the student
-            pas_res=pas.get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf_type,with_conf,ratio_pas=0.5,visu=False)
+            pas_res=pas.get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf_type,ratio_pas=0.5,visu=False)
             pas_list.append(pas_res)
             true_label.append(label_T)
             voted_label.append(label_S)
@@ -356,7 +356,6 @@ def pas_eval(LABEL_LIST,ALL_FILES,k,thresholdAngle,sub_method,normalisation,conf
     plt.tight_layout()
     plt.savefig('Figures/pas_'+str(k)+'norma_'+str(normalisation)+'_'+str(conf_type)+'_'+str(sub_method)+'.png',  pad_inches=5)
     plt.show()
-
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
 def query_ann(ALL_FILES,QUERY_PATH,k,normalisation,type_norm,points,angles,segments,conf_type,loss_ann,n_tree,with_conf):
 
@@ -480,7 +479,7 @@ def ann_video(PATH_DATA,LABEL_LIST_VIDEO,ALL_FILES_VIDEO,clust_flag,clust_type,w
         # get all the files for the label
         FILES=[f for f in listdir(BASE_PATH) if f.endswith(".json")]
         # sorted on different way with a clustering ot not 
-        features_group_by_lab=pd.DataFrame([hp.video_dimensional_analysis(BASE_PATH+"/"+f,nb_min_points_detected,clust_flag,clust_type,visu=False) for num,f in enumerate(FILES)])
+        features_group_by_lab=pd.DataFrame([hp.video_dimensional_analysis(BASE_PATH+"/"+f,nb_min_points_detected,clust_flag,clust_type,visu=True) for num,f in enumerate(FILES)])
         # stores for the features and confidences in a Dataframes of Dataframes
         features_group_by_lab=features_group_by_lab.rename({0:"features",1:"confidences"},axis=1)
         # construct one unique dataset for all the features and confidence 
@@ -546,7 +545,78 @@ def ann_video(PATH_DATA,LABEL_LIST_VIDEO,ALL_FILES_VIDEO,clust_flag,clust_type,w
     plt.tight_layout()
     plt.savefig('Figures/Video_Ann_'+str(clust_type)+'.png', pad_inches=5)
     plt.show()
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------
+def comparison_recall(LABEL_LIST,ALL_FILES,type_comparison,method):
+    '''
+    Input: All the label and files the name of the tested methods and the type of comparison that we want to perform
+    Output: compared recall
+    '''
+
+    if type_comparison == "none":
+        conf_type="none"
+        with_conf=False
+        loss_conf_type="none"
+        normalisation="none"
+        norm_nan="fill_zero"
+
+    if type_comparison == "norm":
+
+        conf_type="none"
+        with_conf=False
+        loss_conf_type="none"
+        norm_nan="mean_on_row"
+
+        if method == "ann":
+            normalisation = "bbox_ratio_kept_center_core"
+        else:
+             normalisation="bbox_ratio_kept"
+
+    if type_comparison == "norm_withconf":
+        
+        conf_type="mean"
+        with_conf=True
+        loss_conf_type="mean"
+
+        if method == "ann":
+            normalisation = "bbox_ratio_kept_center_core"
+        else:
+             normalisation="bbox_ratio_kept"
+        
+    if (type_comparison == "none") or (type_comparison == "norm") or (type_comparison == "norm_withconf"):
+        
+        if method != "pas":
+            recall_by_combi=[]
+            combination=[(True,True,True),(False,True,False),(True,True,False),(False,True,True),(True,False,True),(False,False,True),(True,False,False)]
+            print("(Points,Angles,Segments), Recall")
+            for p,a,s in combination:
+                if method=="knn_modified":
+                    r=knn_modified(LABEL_LIST,ALL_FILES,"euclidean_distance_mean",5,normalisation,2,p,a,s,conf_type,with_conf,loss_conf_type,visu=False)
+                elif method=="ann":
+                    r=ann(LABEL_LIST,ALL_FILES,5,normalisation,2,p,a,s,conf_type,"euclidean",2,norm_nan,with_conf,visu=False)
+                recall_by_combi.append(r)
+                print((p,a,s),r)
+            print("Best Recall is "+str(np.max(recall_by_combi))+" for Points, angle, segment ->"+str(combination[np.argmax(recall_by_combi)]))
+
+        if method == "pas":
+            combination = ["align_torso","core"]
+            recall_by_combi=[]
+            for submethod in combination:
+                r=pas_eval(LABEL_LIST,ALL_FILES,5,30,submethod ,normalisation,conf_type,2,with_conf)                    
+                print("submethod= "+ str(submethod)+" ",r)
+            print("Best Recall is "+str(np.max(recall_by_combi))+" for submethod ->"+str(combination[np.argmax(recall_by_combi)]))
+
+    if type_comparison == "n_tree":
+        combination = [2,4,6,8,10]
+        recall_by_combi=[]
+        for ntree in combination:
+                r=ann(LABEL_LIST,ALL_FILES,5,"bbox_ratio_kept_center_core",type_norm=2,points=True,angles=True,segments=False,conf_type="mean",loss_ann="euclidean",n_tree=ntree,norm_nan="mean_on_row",with_conf=True,visu=False)
+                print("n_tree= "+ str(ntree),r)
     
-    
+    if type_comparison == "loss_ann":
+        combination = ["angular","euclidean","manhattan"]
+        recall_by_combi=[]
+        for lossann in combination:
+                r=ann(LABEL_LIST,ALL_FILES,5,"bbox_ratio_kept_center_core",type_norm=2,points=True,angles=True,segments=False,conf_type="mean",loss_ann=lossann,n_tree=2,norm_nan="mean_on_row",with_conf=True,visu=False)
+                print("loss_ann= "+ str(lossann),r)
 
 

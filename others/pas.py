@@ -215,7 +215,7 @@ def show_before_afterAffineTransformation(kpCenterBbox_T,kpCenterBbox_S,kpSp,cor
 
 #------------------------------------------------------------------------------------
 
-def get_jpss(kpCenterBbox_T,kpCenterBbox_Sp,with_conf=True):
+def get_jpss(kpCenterBbox_T,kpCenterBbox_Sp):
 
     '''
     Input: two pandadataframe : kpCenterBbox_T ( contains all points of the teacher ) and kpCenterBbox_Sp (contains all reconstructed keypoints)
@@ -264,10 +264,8 @@ def get_jpss(kpCenterBbox_T,kpCenterBbox_Sp,with_conf=True):
     k=np.array([0.026,0.025,0.025,0.035,0.035,0.079,0.079,0.072,0.072,0.062,0.062,0.107,0.107,0.087,0.087,0.089,0.089])
     oks["k"]=k[shared_ind]
     oks=oks.set_index("index")
-    if with_conf==True:
-        return np.nansum(np.exp(-oks["distanceT_Sprime"]**2/(2*s**2*oks.k**2))*oks.confidence)/np.nansum(oks.confidence)
-    if with_conf==False:
-        return np.nansum(np.exp(-oks["distanceT_Sprime"]**2/(2*s**2*oks.k**2))*1)
+    # if not we set the conf_type to none oks.confidence will be only one
+    return np.nansum(np.exp(-oks["distanceT_Sprime"]**2/(2*s**2*oks.k**2))*oks.confidence)/np.nansum(oks.confidence)
 
 #------------------------------------------------------------------------------------
         
@@ -294,7 +292,7 @@ def get_jass(kpCenterBbox_T,kpCenterBbox_S,conf_type,thresholdAngle,type_norm):
 
 #------------------------------------------------------------------------------------
 
-def get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf_type,with_conf,ratio_pas=0.5,visu=True):
+def get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf_type,ratio_pas=0.5,visu=True):
 
     '''
     Input: student and teacher file path (FILE_S,FILE_T), ratio used between jass and jpss (ratio_pas), norm used to calculate the angles and segments (type_norm),
@@ -320,7 +318,7 @@ def get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf
         if visu == True:
             show_before_afterAffineTransformation(kpCenterBbox_T,kpCenterBbox_S,kpTp,kpSp,core=True)
     # calculation 
-    jpss=get_jpss(kpTp,kpSp,with_conf)
+    jpss=get_jpss(kpTp,kpSp)
     if visu==True:
         print("JPSS:{}".format(jpss))
 

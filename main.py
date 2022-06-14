@@ -63,6 +63,9 @@ def main():
     parser.add_argument('--nb_min_points_detected', type=int, default=10,
                         help='threshold on the minimum number of points that need to be detected in order to take the pose into consideration')
     
+
+    parser.add_argument('--type_compar', type=str, default="none",
+                        help= 'extract the recall for all the combinaison of points/angles/segments for different settings [none/norm/norm_withconf]')
     args = parser.parse_args()
     
     # list with all the files stored  
@@ -97,11 +100,17 @@ def main():
     elif args.method_name == 'ann':
         ann(LABEL_LIST,ALL_FILES,args.k,args.normalisation,args.type_norm,args.points,args.angles,args.segments,args.conf_type,args.loss_ann,args.n_tree,args.norm_nan,args.with_conf)
     elif args.method_name == 'pas_eval':
-        pas_eval(LABEL_LIST,ALL_FILES,args.k,args.thresholdAngle,args.sub_method,args.normalisation,args.conf_type,args.type_norm,args.with_conf)
+        pas_eval(LABEL_LIST,ALL_FILES,args.k,args.thresholdAngle,args.sub_method,args.normalisation,args.conf_type,args.type_norm)
     elif args.method_name == 'query_ann':
         query_ann(ALL_FILES,args.query_path,args.k,args.normalisation,args.type_norm,args.points,args.angles,args.segments,args.conf_type,args.loss_ann,args.n_tree,args.with_conf)
     elif args.method_name ==  'ann_video':
         ann_video(args.data_path,LABEL_LIST,ALL_FILES_VIDEO,args.clust_flag,args.clust_type,args.with_conf,args.nb_min_points_detected,labels_video)
+    elif args.method_name == 'comparison_method_ann':
+        comparison_recall(LABEL_LIST,ALL_FILES,args.type_compar,"ann")
+    elif args.method_name == 'comparison_method_knn':
+        comparison_recall(LABEL_LIST,ALL_FILES,args.type_compar,"knn_modified")
+    elif args.method_name == 'comparison_method_pas':
+        comparison_recall(LABEL_LIST,ALL_FILES,args.type_compar,"pas")
     else:
         raise Exception("The chosen method is not implemented.")
 

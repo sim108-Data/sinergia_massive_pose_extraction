@@ -103,18 +103,18 @@ def plot_comparison_bodykeypoint(self,student):
     
     # visu for videos 
 
-    def print_frame(FILE,frame,sp,labels_size):
-        FILE=FILE.replace("_openpifpaf.json", ".mp4")
-        vidcap = cv2.VideoCapture(FILE)
+def print_frame(FILE,frame,sp,labels_size):
+    FILE=FILE.replace("_openpifpaf.json", ".mp4")
+    vidcap = cv2.VideoCapture(FILE)
+    success,image = vidcap.read()
+    count = 0
+    while success:
         success,image = vidcap.read()
-        count = 0
-        while success:
-            success,image = vidcap.read()
-            if count==frame:
-                image_frame=image  
-                im=cv2.cvtColor(image_frame, cv2.COLOR_BGR2GRAY)
-                plt.subplot(1,labels_size,sp)
-                plt.imshow(im,cmap="gray")
-                plt.title("Frame "+str(frame))
-                break
-            count += 1
+        if count==frame:
+            image_frame=image  
+            im=cv2.cvtColor(image_frame, cv2.COLOR_BGR2GRAY)
+            plt.subplot(1,labels_size,sp)
+            plt.imshow(im,cmap="gray")
+            plt.title("Frame "+str(frame))
+            break
+        count += 1
