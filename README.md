@@ -90,12 +90,25 @@ To execute the program you need to follow the steps described below:
 ```
 cd geneva_urbanvitality_exploration
 ```
-* Run jupyter lab as follow in the command line:
+* Run Knn best result as follow in the command line:
 ```
-jupyter lab 
+python main.py  --method_name knn_modified  --conf_type none --normalisation bbox_ratio_kept --points True --angles True
+```
+* Run Ann best result as follow in the command line:
+```
+python main.py  --method_name ann --points True --angle True --normalisation bbox_ratio_kept_center_core --norm_nan mean_on_row --with_conf True --conf_type mean --loss_conf_type mean --type_norm 2 --k 5
+```
+* Run PAS best result as follow in the command line:
+```
+python main.py  --method_name pas_eval  --conf_type mean --normalisation bbox_ratio_kept  --thresholdAngle 15 --sub_method core --with_conf True
+
+```
+* Query ann as follow in the command line:
+```
+python main.py  --method_name query_ann --points True --angles True --normalisation bbox_ratio_kept_center_core --conf_type mean --loss_conf_type mean --norm_nan mean_on_row --k 6 --with_conf True
+
 ```
 
-* Another way to open the repository that you have cloned is to open Anaconda Navigator and open it from there.
 
 ## Authors
 
