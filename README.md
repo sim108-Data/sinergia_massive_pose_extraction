@@ -8,7 +8,7 @@ This repository contains the following main folders and files :
 
 * **others** : contains all python files used to compute function necessary at our **methods.py** ( **helpers.py** : all function helping the implementation, **pas.py** : all function used to implement the Position and angle similarity based on the [paper](https://dl.acm.org/doi/10.1145/3410530.3414402) presented in the report and **visualisation.py** : function in order to plot images as examples )
 
-* **methods.py ** : implements all methods used in the project and also a function used to tune our hyperparameters. 
+* **methods.py** : implements all methods used in the project and also a function used to tune our hyperparameters. 
 
 * **main.py** : define the argument parsers and call the methods implemented  in **methods.py**
 
