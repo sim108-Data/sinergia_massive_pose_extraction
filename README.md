@@ -27,7 +27,7 @@ If you are completely new to those libraries. The easiest way is to use "conda" 
 
 If you are using anaconda, you can simply  copy those code lines on the same order into your terminal.
 
-```
+
 * pandas : 
 ```
 conda install -c anaconda pandas
