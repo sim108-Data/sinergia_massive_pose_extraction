@@ -2,7 +2,7 @@
 
 This repository contains the following main folders and files :
 
-* **Data** : regroups all the Data used in this project (FrameToFrame: regroups the files of our selfmade dataset both Json and JPG, Videos regroups the same files than the previous datasets but keeps contains the full video and the Json output of Open PifPaf )
+* **Data** : regroups all the Data used in this project (FrameToFrame: regroups the files of our self-made dataset both Json and JPG, Videos regroups the same files as the previous datasets but keeps contains the full video and the JSON output of Open PifPaf )
 
 * **Figures**: regroups all outputs of the methods used in the code for each tasks ( raw / normalised / confidence ) and auxilliary visualization output. (**Ann**/ **Knn**/**Pas** / **Videos**)
 
@@ -10,18 +10,20 @@ This repository contains the following main folders and files :
 
 * **methods.py ** : implements all methods used in the project and also a function used to tune our hyperparameters. 
 
-* **main.py**: define the argument parser and call the methods define in **methods.py**
+* **main.py**: define the argument parsers and call the methods implemented  in **methods.py**
 
 ## Data
-The data used in this project comes from the [DeepMind 700 Kinetics human action dataset](https://arxiv.org/abs/2010.10864). Updated in 2020, this dataset contains at least 700 video clips extracted from Youtube videos for each of the classes. To define how well those methods quantify the difference between poses and with the helps of Kinetics 700 labels, a selfmade dataset is created. To map the data from Kinetics and outputs from Openpifpad the **train.csv** is used.
+The data used in this project comes from the [DeepMind 700 Kinetics human action dataset](https://arxiv.org/abs/2010.10864). Updated in 2020, this dataset contains at least 700 video clips extracted from Youtube videos for each of the classes. To define how well those methods quantify the difference between poses and with the help of Kinetics 700 labels, a self-made dataset is created. To map the data from Kinetics and outputs from Openpifpad the **train.csv** is used.
 
 ## Getting Started
 
-First, you will need to have " git " install on your computer to be able to clone the repository on your computer. You will also need to have python installed. If this is not the case you can download it from here: Python: https://www.python.org/downloads/ .
+First, you will need to have " git " install on your computer to be able to clone the repository on your computer. You will also need to have python installed. If this is not the case you can download it from here: [Python]( https://www.python.org/downloads/ )
 
 ## Dependencies and Installing
 
-The code is using some external libraries: "Numpy", "Pandas" to analyze data, "Matplotlib" and "Seaborn" to visualize the output of the analysis, "[openpifpaf](https://openpifpaf.github.io/intro.html)" to extract the skeletons.
+The code is using some external libraries: "Numpy", "Pandas" to analyze data, "Matplotlib" and "Seaborn" to visualize the output of the analysis, and "[openpifpaf](https://openpifpaf.github.io/intro.html)" to extract the skeletons. 
+
+All other secondary libraries used at some point in the analysis are accessible in the **requirements.txt** file.
 
 ### Executing program
 
@@ -36,16 +38,16 @@ cd  sinergia_massive_pose_extraction
 ```
 python main.py  --method_name knn_modified  --conf_type none --normalisation bbox_ratio_kept --points True --angles True
 ```
-* Run Ann best result as follow with the command linee:
+* Run Ann's best result as following with the command line:
 ```
 python main.py  --method_name ann --points True --angle True --normalisation bbox_ratio_kept_center_core --norm_nan mean_on_row --with_conf True --conf_type mean --loss_conf_type mean --type_norm 2 --k 5
 ```
-* Run PAS best result as follow with the command line:
+* Run PAS best result as following with the command line:
 ```
 python main.py  --method_name pas_eval  --conf_type mean --normalisation bbox_ratio_kept  --thresholdAngle 15 --sub_method core --with_conf True
 
 ```
-* Query ann as follow with the command line:
+* Query ann as following with the command line:
 ```
 python main.py  --method_name query_ann --points True --angles True --normalisation bbox_ratio_kept_center_core --conf_type mean --loss_conf_type mean --norm_nan mean_on_row --k 6 --with_conf True
 
