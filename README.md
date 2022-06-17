@@ -47,11 +47,25 @@ python main.py  --method_name ann --points True --angle True --normalisation bbo
 python main.py  --method_name pas_eval  --conf_type mean --normalisation bbox_ratio_kept  --thresholdAngle 15 --sub_method core --with_conf True
 
 ```
-* Query ann as following with the command line:
+* Query ann as following with the command line for a my image of basketaball dribbling :
 ```
 python main.py  --method_name query_ann --points True --angles True --normalisation bbox_ratio_kept_center_core --conf_type mean --loss_conf_type mean --norm_nan mean_on_row --k 6 --with_conf True
 
 ```
+
+* Query ann as following with the command line for a my image of tennis :
+* 
+```
+python main.py  --method_name query_ann --points True --angles True --normalisation bbox_ratio_kept_center_core --conf_type mean --loss_conf_type mean --norm_nan mean_on_row --k 6 --with_conf True --query_path "my_Data\my_tennis.jpg"
+
+```
+
+* Query ann as following with the command line for a test image of tennis :
+```
+python main.py  --method_name query_ann --points True --angles True --normalisation bbox_ratio_kept_center_core --conf_type mean --loss_conf_type mean --norm_nan mean_on_row --k 6 --with_conf True --query_path "my_Data\test_tennis.jpg"
+
+```
+
 
 
 ## Authors
