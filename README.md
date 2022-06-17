@@ -73,7 +73,7 @@ python main.py  --method_name query_ann --points True --angles True --normalisat
 
 * Query ann on videos as following with the command line :
 ```
-python main.py  --method_name ann_video --clut_type minMax_xy"
+python main.py  --method_name ann_video --clut_type minMax_xy
 
 ```
 
