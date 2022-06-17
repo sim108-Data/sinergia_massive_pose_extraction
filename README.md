@@ -25,11 +25,10 @@ The code is using some external libraries: "Numpy", "Pandas" to analyze data, "M
 
  **requirements.txt** file:
 
-'''
-
+```
 pip install -r requirements.txt
+```
 
-'''
 
 ### Executing program
 
