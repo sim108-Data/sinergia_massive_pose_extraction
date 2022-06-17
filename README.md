@@ -21,7 +21,7 @@ First, you will need to have " git " install on your computer to be able to clon
 
 ## Dependencies and Installing
 
-The code is using some external libraries: "Numpy", "Pandas" to analyze data, "Matplotlib" and "Seaborn" to visualize the output of the analysis, and "[openpifpaf](https://openpifpaf.github.io/intro.html)" to extract the skeletons. 
+The code is using some external libraries: "Numpy", "Pandas" to analyze data, "Matplotlib" and "Seaborn" to visualize the output of the analysis, "[opencv](https://opencv.org/)" to deal with image and videos, "[sklearn](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html)" to apply dimensional reduction, "[tslearn](https://tslearn.readthedocs.io/en/stable/gen_modules/clustering/tslearn.clustering.TimeSeriesKMeans.html)" for clustering with Kmean,  and "[openpifpaf](https://openpifpaf.github.io/intro.html)" to extract the skeletons. 
 
 All other secondary libraries used at some point in the analysis are accessible in the **requirements.txt** file.
 
