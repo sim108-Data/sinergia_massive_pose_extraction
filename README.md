@@ -4,13 +4,13 @@ This repository contains the following main folders and files :
 
 * **Data** : regroups all the Data used in this project (FrameToFrame: regroups the files of our self-made dataset both Json and JPG, Videos regroups the same files as the previous datasets but keeps contains the full video and the JSON output of Open PifPaf )
 
-* **Figures**: regroups all outputs of the methods used in the code for each tasks ( raw / normalised / confidence ) and auxilliary visualization output. (**Ann**/ **Knn**/**Pas** / **Videos**)
+* **Figures** : regroups all outputs of the methods used in the code for each tasks ( raw / normalised / confidence ) and auxilliary visualization output. (**Ann**/ **Knn**/**Pas** / **Videos**)
 
-* **others**: contains all python files used to compute function necessary at our **methods.py** ( **helpers.py** : all function helping the implementation, **pas.py** : all function used to implement the Position and angle similarity based on the [paper](https://dl.acm.org/doi/10.1145/3410530.3414402) presented in the report and **visualisation.py** : function in order to plot images as examples )
+* **others** : contains all python files used to compute function necessary at our **methods.py** ( **helpers.py** : all function helping the implementation, **pas.py** : all function used to implement the Position and angle similarity based on the [paper](https://dl.acm.org/doi/10.1145/3410530.3414402) presented in the report and **visualisation.py** : function in order to plot images as examples )
 
 * **methods.py ** : implements all methods used in the project and also a function used to tune our hyperparameters. 
 
-* **main.py**: define the argument parsers and call the methods implemented  in **methods.py**
+* **main.py** : define the argument parsers and call the methods implemented  in **methods.py**
 
 ## Data
 The data used in this project comes from the [DeepMind 700 Kinetics human action dataset](https://arxiv.org/abs/2010.10864). Updated in 2020, this dataset contains at least 700 video clips extracted from Youtube videos for each of the classes. To define how well those methods quantify the difference between poses and with the help of Kinetics 700 labels, a self-made dataset is created. To map the data from Kinetics and outputs from Openpifpad the **train.csv** is used.
