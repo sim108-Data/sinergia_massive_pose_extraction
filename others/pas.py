@@ -28,37 +28,6 @@ def separate_body_part(FILE,type):
     return pointFeaturesHead,pointFeaturesArmLeft,pointFeaturesArmRight,pointFeaturesTorso,pointFeaturesLegLeft,pointFeaturesLegRight,bbox,keypointCenterBbox
 
 #------------------------------------------------------------------------------------
-
-def show_subject(FILE_T,FILE_S,bbox_T,bbox_S):
-
-    ''' 
-    Input: FILE of the "teacher"(FILE_T)[string], File of the "student" to compare with the teacher (FILE_S) [string]
-    and both bounding box [list of float] in order to plot correctly the image 
-
-    Output: plot of both subjects (teacher/student)
-    '''
-
-    FILE_IMAGE_T = FILE_T.replace(".json", ".jpg")
-    FILE_IMAGE_T = FILE_IMAGE_T.replace("Json", "Image")
-    FILE_IMAGE_S = FILE_S.replace(".json", ".jpg")
-    FILE_IMAGE_S = FILE_IMAGE_S.replace("Json", "Image")
-    plt.subplots(1,2,figsize=(19,6))
-    plt.subplot(1,2,1)
-    img_T = cv2.imread(FILE_IMAGE_T)
-    plt.gca().invert_yaxis()
-    bbox_T = np.abs(bbox_T).astype(np.int64)
-    im_T = img_T[bbox_T[1]:bbox_T[3]+bbox_T[1],bbox_T[0]:bbox_T[0]+bbox_T[2],:]
-    plt.title("Input")
-    plt.imshow(im_T)
-    plt.subplot(1,2,2)
-    img_S = cv2.imread(FILE_IMAGE_S)
-    plt.gca().invert_yaxis()
-    bbox_S = np.abs(bbox_S).astype(np.int64)
-    im_S = img_S[bbox_S[1]:bbox_S[3]+bbox_S[1],bbox_S[0]:bbox_S[0]+bbox_S[2],:]
-    plt.title("Output")
-    plt.imshow(im_S)
-
-#------------------------------------------------------------------------------------
 # The following function have been find at this url : 
 # https://stackoverflow.com/questions/20677795/how-do-i-compute-the-intersection-point-of-two-lines
 
@@ -184,47 +153,28 @@ def reconstruction_Sp(pFHead_Sp,pFArmLeft_Sp,pFArmRight_Sp,pFTorso_Sp,pFLegLeft_
     reconstructed_df=kpCenterBbox_Sp.reset_index().groupby(["index"]).mean()
     return reconstructed_df
 
-#------------------------------------------------------------------------------------
-
-def show_before_afterAffineTransformation(kpCenterBbox_T,kpCenterBbox_S,kpSp,core=True):
-
-    '''
-    Input: keypoint dataframe of the teacher , df of the student before and after reconstruction and also a boolean that show the core on the plot
-    Output: comparison before after of the affine transformation
-    '''
-
-    plt.subplots(1,2,figsize=(15,6))
-    plt.subplot(1,2,1)
-    kp_visu.plot_comparison_bodykeypoint(kpCenterBbox_T,kpCenterBbox_S)
-    if core==True:
-        cpT=get_core_triangle(kpCenterBbox_T)
-        cpS=get_core_triangle(kpCenterBbox_S)
-        plt.scatter(cpT[0],cpT[1],s=100,marker="x",color="blue")
-        plt.scatter(cpS[0],cpS[1],s=100,marker="x",color="red")
-    plt.title("Before")
-    plt.subplot(1,2,2)
-    kp_visu.plot_comparison_bodykeypoint(kpCenterBbox_T,kpSp)
-    if core==True:
-        cpTp=get_core_triangle(kpCenterBbox_T)
-        cpSp=get_core_triangle(kpSp)
-        plt.scatter(cpTp[0],cpTp[1],s=100,marker="x",color="blue")
-        plt.scatter(cpSp[0],cpSp[1],s=100,marker="x",color="red")
-    plt.title("After")
-    plt.suptitle("P-Affine")
-    plt.show()
 
 #------------------------------------------------------------------------------------
 
-def get_jpss(kpCenterBbox_T,kpCenterBbox_Sp):
+def get_jpss(kpCenterBbox_T,kpCenterBbox_Sp,with_conf):
 
     '''
     Input: two pandadataframe : kpCenterBbox_T ( contains all points of the teacher ) and kpCenterBbox_Sp (contains all reconstructed keypoints)
     Output: Joint Position similatity evaluation
     
     '''
-    # take only the point with good confidence 
+    if with_conf==False:
+        #boolean if the point is find
+        mask_T = kpCenterBbox_T["confidence"].notna()
+        mask_Sp =kpCenterBbox_Sp["confidence"].notna()
+        #apply 1 of confidence to all the point which have been found
+        kpCenterBbox_T["confidence"][mask_T]=1
+        kpCenterBbox_Sp["confidence"][mask_Sp]=1
+ 
+    # take only the point with good confidence  in case we are dealing with confidence
     kpCenterBbox_T["visibility"]= kpCenterBbox_T.confidence>0.5
     kpCenterBbox_Sp["visibility"]= kpCenterBbox_Sp.confidence>0.5
+
     #find the index that are both visible 
     indexDetect_T=kpCenterBbox_T[kpCenterBbox_T.visibility==True].index
     indexDetect_Sp=kpCenterBbox_Sp[kpCenterBbox_Sp.visibility==True].index
@@ -232,6 +182,7 @@ def get_jpss(kpCenterBbox_T,kpCenterBbox_Sp):
     shared_ind=indexDetect_T[indexDetect_T.isin(indexDetect_Sp)]
     shared_kp_T=kpCenterBbox_T.loc[shared_ind]
     shared_kp_Sp=kpCenterBbox_Sp.loc[shared_ind]
+
     #flatten 
     t_flat=np.array(shared_kp_T[["x","y"]]).flatten()
     sp_flat=np.array(shared_kp_Sp[["x","y"]]).flatten()
@@ -279,20 +230,28 @@ def get_jass(kpCenterBbox_T,kpCenterBbox_S,conf_type,thresholdAngle,type_norm):
     
     angleTeacher=hp.create_df_features_angles(kpCenterBbox_T,type_norm,conf_type)
     angleStudent=hp.create_df_features_angles(kpCenterBbox_S,type_norm,conf_type)
-    #minConf=pd.concat([angleTeacher,angleStudent]).loc["confidence"]
+    conf_df=pd.concat([angleTeacher,angleStudent]).loc["confidence"]
     angleDiff=(angleTeacher.T.metric-angleStudent.T.metric).reset_index()
-    #min of the confidence
-    #angleDiff["confidence"]=np.min(minConf.values,axis=0)
+
+    if conf_type=="mean":
+        angleDiff["confidence"]=np.mean(conf_df.values,axis=0)
+        
+    elif conf_type=="min":
+        angleDiff["confidence"]=np.min(conf_df.values,axis=0)
+    
     angleDiff=angleDiff.set_index("index")
+    #jass = 1 if the angle are the same 0 if over the threshold else we use the equation presented in the report
     angleDiff.loc[np.abs(angleDiff.metric)==0,"metric"]=1
     angleDiff.loc[np.abs(angleDiff.metric)>thresholdAngle,"metric"]=0
     angleDiff.loc[(np.abs(angleDiff.metric)<=thresholdAngle)&(np.abs(angleDiff.metric)>0),"metric"]=np.sqrt(((thresholdAngle**2)-(angleDiff.metric[(np.abs(angleDiff.metric)<=thresholdAngle)&(np.abs(angleDiff.metric)>0)]**2)).astype("float64"))/thresholdAngle
     jass=angleDiff.metric
+    if conf_type!="none":
+        jass=jass/angleDiff.confidence
     return jass.mean()
 
 #------------------------------------------------------------------------------------
 
-def get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf_type,ratio_pas=0.5,visu=True):
+def get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf_type,with_conf,ratio_pas):
 
     '''
     Input: student and teacher file path (FILE_S,FILE_T), ratio used between jass and jpss (ratio_pas), norm used to calculate the angles and segments (type_norm),
@@ -303,26 +262,21 @@ def get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf
 
     _,_,_,pFTorso_T,_,_,bbox_T,kpCenterBbox_T=separate_body_part(FILE_T,normalisation)
     pFHead_S,pFArmLeft_S,pFArmRight_S,pFTorso_S,pFLegLeft_S,pFLegRight_S,bbox_S,kpCenterBbox_S=separate_body_part(FILE_S,normalisation)
-    if visu==True:
-        show_subject(FILE_T,FILE_S,bbox_T,bbox_S)
+
     if sub_method=="align_torso":
         pFTorso_Sp=align_student_to_teacher(pFTorso_T, pFTorso_S)
         pFHead_Sp,pFArmLeft_Sp,pFArmRight_Sp,pFLegLeft_Sp,pFLegRight_Sp=translate_bodyPart(pFTorso_S,pFTorso_Sp,pFHead_S,pFArmLeft_S,pFArmRight_S,pFTorso_S,pFLegLeft_S,pFLegRight_S)
         kpCenterBbox_Sp=reconstruction_Sp(pFHead_Sp,pFArmLeft_Sp,pFArmRight_Sp,pFTorso_Sp,pFLegLeft_Sp,pFLegRight_Sp)
-        if visu==True:
-            show_before_afterAffineTransformation(kpCenterBbox_T,kpCenterBbox_S,kpCenterBbox_Sp)
         kpTp,kpSp=kpCenterBbox_T,kpCenterBbox_Sp
+        
     if sub_method=="core":
         kpTp=align_core_to_center(kpCenterBbox_T,dst=(0.5,0.5))
         kpSp=align_core_to_center(kpCenterBbox_S,dst=(0.5,0.5))
-        if visu == True:
-            show_before_afterAffineTransformation(kpCenterBbox_T,kpCenterBbox_S,kpTp,kpSp,core=True)
-    # calculation 
-    jpss=get_jpss(kpTp,kpSp)
-    if visu==True:
-        print("JPSS:{}".format(jpss))
 
-    jass=get_jass(kpCenterBbox_T,kpCenterBbox_S,conf_type=conf_type,thresholdAngle=thresholdAngle,type_norm=type_norm)
-    if visu==True:
-        print("JASS:{}".format(jass))
+    # calculation 
+    jpss=get_jpss(kpTp,kpSp,with_conf)
+
+
+    jass=get_jass(kpCenterBbox_T,kpCenterBbox_S,conf_type,thresholdAngle,type_norm)
+
     return (jass*ratio_pas)+jpss*ratio_pas

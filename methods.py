@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay,recall_score
@@ -29,7 +29,8 @@ def knn_modified(LABEL_LIST,ALL_FILES,loss_type,k,normalisation,type_norm,points
     Output: 
     Recall matrix of the comparison between all poses and the confusion matrix for the different classes
     '''
-    
+    # visu = True means that we are showing the matrix of confusion needs to be False to extract all the combination
+
     # Start timer 
     start = time.time() 
 
@@ -171,6 +172,9 @@ def ann(LABEL_LIST,ALL_FILES,k,normalisation,type_norm,points,angles,segments,co
     Output: 
     Recall matrix of the comparison between all poses and the confusion matrix for the different classes
     '''
+
+    # visu = True means that we are showing the matrix of confusion needs to be False to extract all the combination 
+
     # Start timer
     start = time.time()
 
@@ -292,7 +296,7 @@ def ann(LABEL_LIST,ALL_FILES,k,normalisation,type_norm,points,angles,segments,co
         plt.show()
     return recall
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
-def pas_eval(LABEL_LIST,ALL_FILES,k,thresholdAngle,sub_method,normalisation,conf_type,type_norm):
+def pas_eval(LABEL_LIST,ALL_FILES,k,thresholdAngle,sub_method,normalisation,conf_type,type_norm,with_conf):
 
     ''' 
     INFO: 
@@ -327,7 +331,7 @@ def pas_eval(LABEL_LIST,ALL_FILES,k,thresholdAngle,sub_method,normalisation,conf
         # comparison with all the other pose
         for FILE_S in ALL_FILES:
             label_S=FILE_S[FILE_S.find("n/")+2 : FILE_S.rfind("/")] # label of the student
-            pas_res=pas.get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf_type,ratio_pas=0.5,visu=False)
+            pas_res=pas.get_pas(FILE_S,FILE_T,type_norm,sub_method,thresholdAngle,normalisation,conf_type,with_conf,ratio_pas=0.5)
             pas_list.append(pas_res)
             true_label.append(label_T)
             voted_label.append(label_S)
@@ -376,6 +380,11 @@ def query_ann(ALL_FILES,QUERY_PATH,k,normalisation,type_norm,points,angles,segme
     capture = cv2.VideoCapture(QUERY_PATH)
     _,image = capture.read()
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+    #print the image in color
+    plt.figure()
+    img_T = cv2.imread(QUERY_PATH)
+    plt.imshow(img_T)
 
     # extract squeleton with 
     predictor = openpifpaf.Predictor(checkpoint='shufflenetv2k16',json_data=True)
@@ -442,8 +451,6 @@ def query_ann(ALL_FILES,QUERY_PATH,k,normalisation,type_norm,points,angles,segme
         df_ann["distance_with_conf"]= df_ann.distance/df_ann.conf
         neighbors=df_ann.sort_values("distance_with_conf")["neigh"].values
     neighbors_sort=neighbors[0:k]
-    img_T = cv2.imread(QUERY_PATH)
-    plt.imshow(img_T)
 
 
     # plot the result
@@ -467,6 +474,8 @@ def ann_video(PATH_DATA,LABEL_LIST_VIDEO,ALL_FILES_VIDEO,clust_flag,clust_type,w
     Output: general recall for the chosen labels and matrix of confusion
     '''
 
+    # visu = True means that we are showing the all dimension reduction plot and images extracted needs to be False when computing the matrix de confusion
+
     #initialisation
 
     all_features_group=pd.DataFrame()
@@ -479,7 +488,7 @@ def ann_video(PATH_DATA,LABEL_LIST_VIDEO,ALL_FILES_VIDEO,clust_flag,clust_type,w
         # get all the files for the label
         FILES=[f for f in listdir(BASE_PATH) if f.endswith(".json")]
         # sorted on different way with a clustering ot not 
-        features_group_by_lab=pd.DataFrame([hp.video_dimensional_analysis(BASE_PATH+"/"+f,nb_min_points_detected,clust_flag,clust_type,visu=True) for num,f in enumerate(FILES)])
+        features_group_by_lab=pd.DataFrame([hp.video_dimensional_analysis(BASE_PATH+"/"+f,nb_min_points_detected,clust_flag,clust_type,visu=False) for num,f in enumerate(FILES)])
         # stores for the features and confidences in a Dataframes of Dataframes
         features_group_by_lab=features_group_by_lab.rename({0:"features",1:"confidences"},axis=1)
         # construct one unique dataset for all the features and confidence 
@@ -547,6 +556,7 @@ def ann_video(PATH_DATA,LABEL_LIST_VIDEO,ALL_FILES_VIDEO,clust_flag,clust_type,w
     plt.show()
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------
 def comparison_recall(LABEL_LIST,ALL_FILES,type_comparison,method):
+
     '''
     Input: All the label and files the name of the tested methods and the type of comparison that we want to perform
     Output: compared recall

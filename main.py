@@ -10,9 +10,9 @@ def main():
     parser = argparse.ArgumentParser(description='Query images metrics testing')
     #data
     parser.add_argument('--data_path', type=str, default='Data/',
-                        help='Path of data.')
+                        help = 'Path of data.')
     parser.add_argument('--query_path', type=str, default='my_Data\Frame_baskdribble.jpg',
-                        help='Path of the picture we want to query.')
+                        help = 'Path of the picture we want to query.')
 
     #choice of the method
     parser.add_argument('--method_name', type=str, default='ann',
@@ -100,7 +100,7 @@ def main():
     elif args.method_name == 'ann':
         ann(LABEL_LIST,ALL_FILES,args.k,args.normalisation,args.type_norm,args.points,args.angles,args.segments,args.conf_type,args.loss_ann,args.n_tree,args.norm_nan,args.with_conf)
     elif args.method_name == 'pas_eval':
-        pas_eval(LABEL_LIST,ALL_FILES,args.k,args.thresholdAngle,args.sub_method,args.normalisation,args.conf_type,args.type_norm)
+        pas_eval(LABEL_LIST,ALL_FILES,args.k,args.thresholdAngle,args.sub_method,args.normalisation,args.conf_type,args.type_norm,args.with_conf)
     elif args.method_name == 'query_ann':
         query_ann(ALL_FILES,args.query_path,args.k,args.normalisation,args.type_norm,args.points,args.angles,args.segments,args.conf_type,args.loss_ann,args.n_tree,args.with_conf)
     elif args.method_name ==  'ann_video':

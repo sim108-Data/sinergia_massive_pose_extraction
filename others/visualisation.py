@@ -1,21 +1,32 @@
 # -*- coding: utf-8 -*-
-"""Plot the segment and the key point to visualise the pose after visualisation"""
+""" Different type of visualisation are shown in this file """
 #lib
 import pandas as pd 
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-#https://stackoverflow.com/questions/20677795/how-do-i-compute-the-intersection-point-of-two-lines
+# segments following the bones networks
 
 segments=np.array([[3, 5], [4, 6], [5, 7], [6, 8], [7,9], [8, 10], [5, 6], [5, 11], [6, 12],\
                    [11, 12], [11, 13], [12, 14], [13, 15], [14, 16]])
+
+# param for plotting     
 font = {
-  'weight' : 'bold',
-  'size' : 10}
+'weight' : 'bold',
+'size' : 14}
 plt.rc('font', **font)
-# plot
+
+# plot features on a image
 def plot_keypoint(self,activity,frame_number=None,FILE=None,bbox=None,with_im=False):
+    
+    '''
+    " This function is not used in the other files but I decided to keep it as it was the function 
+    used to create the visualisation shown into the report ( point/feature/segment of deadlifting)
+    Input: The datapoints,bbox
+    Output: the points,angles and segments on the image.
+
+    '''
     if with_im==True:
         FILE_IMAGE_T=FILE.replace(".json", ".jpg")
         FILE_IMAGE_T=FILE_IMAGE_T.replace("Json", "Image")
@@ -29,13 +40,7 @@ def plot_keypoint(self,activity,frame_number=None,FILE=None,bbox=None,with_im=Fa
         self.x=self.x*im.shape[1]
         self.y=self.y*im.shape[0]/ratio_hw
     
-# param for plotting     
-    font = {
-  'weight' : 'bold',
-  'size' : 14}
-    plt.rc('font', **font)
     fig, ax = plt.subplots(1,3,figsize=(15,6))
-    
     # keypoints
     plt.subplot(1,3,1)
     plt.scatter(self.x,self.y,s=72)
@@ -81,29 +86,15 @@ def plot_keypoint(self,activity,frame_number=None,FILE=None,bbox=None,with_im=Fa
 
 #------------------------------------------------------------------------------------
 
-def plot_comparison_bodykeypoint(self,student):
-    # (4,self.shape[0]) commence a 4 pour pas annoté les points de la tête
-    # Attention :segments[2:] c'est pour pas avoir les oreilles car on voyait rien et pas utile
-    plt.scatter(self.x,self.y,s=72)
-    for j in range(4,self.shape[0]):
-        if (pd.isna(self.x[j]) and pd.isna(self.y[j])) is False:
-            plt.text(self.x[j],self.y[j],str(j),color="k")
-    for i,[p1,p2] in enumerate(segments[2:]):
-        if (pd.isna(self.x[p1]) and pd.isna(self.y[p1]) and pd.isna(self.x[p2]) and pd.isna(self.y[p2])) is False:
-            plt.plot([self.x[p1], self.x[p2]], [self.y[p1], self.y[p2]], linewidth=2,color="blue")
-            plt.title("Point",font)
-            
-    plt.scatter(student.x,student.y,s=72)
-    for i,[p1,p2] in enumerate(segments[2:]):
-        if (pd.isna(student.x[p1]) and pd.isna(student.y[p1]) and pd.isna(student.x[p2]) and pd.isna(student.y[p2])) is False:
-            plt.plot([student.x[p1], student.x[p2]], [student.y[p1], student.y[p2]], linewidth=2,color="red")
-            plt.title("Point",font)
-            
-    plt.gca().invert_yaxis()
-    
-    # visu for videos 
+# visu for videos 
 
 def print_frame(FILE,frame,sp,labels_size):
+
+    '''
+    Input: the files,the frames and the lable size ( depends on how much image we want to output)
+    Output: plot the different chosen image from a video ( used for the video)
+    
+    '''
     FILE=FILE.replace("_openpifpaf.json", ".mp4")
     vidcap = cv2.VideoCapture(FILE)
     success,image = vidcap.read()
@@ -118,3 +109,6 @@ def print_frame(FILE,frame,sp,labels_size):
             plt.title("Frame "+str(frame))
             break
         count += 1
+
+
+#------------------------------------------------------------------------------------

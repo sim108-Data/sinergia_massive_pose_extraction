@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from msilib.schema import File
+
 import numpy as np 
 import pandas as pd
 import others.pas as pas
@@ -610,12 +610,10 @@ def video_dimensional_analysis(FILE,nb_min_points_detected,clust=True,clust_type
             plt.show()
             
         #drop the frame in all groups
+        
         groups=groups.drop("frame",axis=1)
         groups_conf=groups_conf.drop("frame",axis=1)
-        print("Features")
-        print(groups)
-        print("Confidence")
-        print(groups_conf)
+
     return groups.unstack().values,groups_conf.unstack().values
 
 
