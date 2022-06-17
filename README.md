@@ -23,26 +23,6 @@ First, you will need to have " git " install on your computer to be able to clon
 
 The code is using some external libraries: "Numpy", "Pandas" to analyze data, "Matplotlib" and "Seaborn" to visualize the output of the analysis, "[openpifpaf](https://openpifpaf.github.io/intro.html)" to extract the skeletons.
 
-If you are completely new to those libraries. The easiest way is to use "conda" command in your terminal, once you have downloaded Anaconda. Those can also be downloaded in some other way. More information is provided on their websites
-
-If you are using anaconda, you can simply  copy those code lines on the same order into your terminal.
-
-
-* pandas : 
-```
-conda install -c anaconda pandas
-```
-* matplotlib :
-
-```
-conda install matplotlib
-```
-* numpy : 
-```
-conda install -c anaconda numpy
-```
-
-
 ### Executing program
 
 To execute the program you need to follow the steps described below:
