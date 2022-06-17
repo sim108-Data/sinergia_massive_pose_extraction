@@ -10,7 +10,7 @@ This repository contains the following main folders and files :
 
 * **methods.py** : implements all methods used in the project and also a function used to tune our hyperparameters. 
 
-* **main.py** : define the argument parsers and call the methods implemented  in **methods.py**
+* **main.py** : define the argument parsers and call the methods implemented  in "**methods.py**"
 
 ## Data
 The data used in this project comes from the [DeepMind 700 Kinetics human action dataset](https://arxiv.org/abs/2010.10864). Updated in 2020, this dataset contains at least 700 video clips extracted from Youtube videos for each of the classes. To define how well those methods quantify the difference between poses and with the help of Kinetics 700 labels, a self-made dataset is created. To map the data from Kinetics and outputs from Openpifpad the **train.csv** is used.
